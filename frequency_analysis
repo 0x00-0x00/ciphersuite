@@ -68,7 +68,7 @@ class Frequency(object):
     def __init__(self, freq, cipher):
         if type(cipher) is bytes:
             cipher = cipher.decode()
-        self.cipher = cipher
+        self.cipher = cipher.upper()
         self.model_frequency = freq
         self.cipher_frequency = dict()
         self.cipher_len = len(self.cipher)
@@ -79,6 +79,8 @@ class Frequency(object):
     def _analyze_frequency(self):
         cipher_letters = set(self.cipher)
         for char in cipher_letters:
+            if char is " ":
+                continue
             self.cipher_frequency[char] = (self.cipher.count(char) / float(self.cipher_len))
         #print(self.cipher_frequency)
         return 0

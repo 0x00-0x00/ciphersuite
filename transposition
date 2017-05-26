@@ -1,0 +1,43 @@
+#!/usr/bin/env python
+
+import argparse
+
+class Transposition(object):
+    def __init__(self, data, col):
+        self.data = data
+        self.col = col
+
+    def _split(self):
+        out = list()
+        while len(self.data) % self.col != 0:
+            self.data += " "
+        ce = len(self.data) / self.col
+        data = list(self.data)
+        for x in range(0, self.col):
+            for i in range(x, len(data), self.col):
+                out.append(data[i])
+        return out
+
+    def _transpose(self, part_list):
+        out = str()
+        ce = len(self.data) / self.col
+        for i in range(0, ce):
+            for element in part_list:
+                out += element[i:i+1]
+        return out
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--string", help="String to encode", required=True)
+    parser.add_argument("-n", "--number", help="Number of columns", required=True, type=int)
+    args = parser.parse_args()
+    #print("String: {0}".format(args.string))
+    #print("Number: {0}".format(args.number))
+    #print( "=" * 25)
+    t = Transposition(args.string, args.number)
+    print(t._transpose(t._split()))
+    return 0
+
+if __name__ == "__main__":
+    main()

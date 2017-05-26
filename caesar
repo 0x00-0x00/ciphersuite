@@ -1,0 +1,72 @@
+#!/usr/bin/env python
+import re
+import argparse
+
+
+LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+MAX_SHIFT = len(LETTERS)
+
+
+def caesar_cipher_regex(message):
+    regex = "^\/caesare\s+(?P<data>[a-zA-Z]+)"
+    m = re.match(regex, message)
+    if not m:
+        return None
+    else:
+        return m.groupdict()["data"]
+
+def caesar_cipher_decipher_regex(message):
+    regex = "^\/caesard\s+(?P<data>[a-zA-Z]+)"
+    m = re.match(regex, message)
+    if not m:
+        return None
+    else:
+        return m.groupdict()["data"]
+
+
+class CaesarCipher(object):
+    def __init__(self, data):
+        if type(data) is bytes:
+            data = data.decode()
+        self.data = data.upper()
+
+    def shift(self, shift_num):
+        out = str()
+        for char in self.data:
+            if char not in LETTERS:
+                out += char
+            index = LETTERS.index(char)
+            index += shift_num
+            out += LETTERS[index % MAX_SHIFT: (index % MAX_SHIFT)+1]
+        return out
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--string", help="String to encode",
+            required=True, type=str)
+    parser.add_argument("--shift", help="Shift number",
+            type=int)
+    parser.add_argument("--all", help="Shift all possibilities",
+            action="store_true")
+    parser.add_argument("--rot13", help="Rot 13 encode",
+            action="store_true")
+
+    args = parser.parse_args()
+    if args.shift:
+        c = CaesarCipher(args.string)
+        print(c.shift(args.shift))
+
+    if args.all is True:
+        c = CaesarCipher(args.string)
+        for i in range(0, MAX_SHIFT):
+            print(c.shift(i))
+
+    if args.rot13 is True:
+        c = CaesarCipher(args.string)
+        print(c.shift(13))
+    return 0
+
+
+
+if __name__ == "__main__":
+    main()

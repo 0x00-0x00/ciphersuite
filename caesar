@@ -35,6 +35,7 @@ class CaesarCipher(object):
         for char in self.data:
             if char not in LETTERS:
                 out += char
+                continue
             index = LETTERS.index(char)
             index += shift_num
             out += LETTERS[index % MAX_SHIFT: (index % MAX_SHIFT)+1]

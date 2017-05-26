@@ -87,6 +87,8 @@ class Frequency(object):
 
     def _measure_distance(self):
         for element in self.cipher_frequency:
+            if element not in self.model_frequency.keys():
+                continue
             model_frequency = self.model_frequency[element]
             cipher_frequency = self.cipher_frequency[element]
             self.distance = self.distance + (cipher_frequency - model_frequency)

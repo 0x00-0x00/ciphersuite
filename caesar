@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 import re
 import argparse
-
+import os
 
 LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+ASCII_CHARS = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~'
 MAX_SHIFT = len(LETTERS)
 
 
@@ -25,45 +26,63 @@ def caesar_cipher_decipher_regex(message):
 
 
 class CaesarCipher(object):
-    def __init__(self, data):
+    def __init__(self, data, charset):
         if type(data) is bytes:
             data = data.decode()
         self.data = data.upper()
+        self.max_shift = len(charset)
+        self.charset = charset
 
     def shift(self, shift_num):
         out = str()
         for char in self.data:
-            if char not in LETTERS:
+            if char not in self.charset:
                 out += char
                 continue
-            index = LETTERS.index(char)
+            index = self.charset.index(char)
             index += shift_num
-            out += LETTERS[index % MAX_SHIFT: (index % MAX_SHIFT)+1]
+            out += self.charset[index % self.max_shift: (index % self.max_shift)+1]
         return out
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--string", help="String to encode",
-            required=True, type=str)
+    parser.add_argument("--string", help="String to encode", type=str)
+    parser.add_argument("--file", help="File containing a cipher", type=str)
     parser.add_argument("--shift", help="Shift number",
             type=int)
     parser.add_argument("--all", help="Shift all possibilities",
             action="store_true")
     parser.add_argument("--rot13", help="Rot 13 encode",
             action="store_true")
+    parser.add_argument("--ascii", help="Use ascii table instead of alphabet.",
+            action="store_true")
 
     args = parser.parse_args()
+
+    if args.file:
+        if not os.path.exists(args.file):
+            print("[!] File does not exists!")
+            return 1
+        print("[+] Reading data from file ...")
+        with open(args.file, "r") as f:
+            args.string = f.read()
+
+    CHARSET = LETTERS
+    if args.ascii is True:
+        print("[+] Using ascii table for shifting ...")
+        CHARSET = ASCII_CHARS
+
     if args.shift:
-        c = CaesarCipher(args.string)
+        c = CaesarCipher(args.string, CHARSET)
         print(c.shift(args.shift))
 
     if args.all is True:
-        c = CaesarCipher(args.string)
-        for i in range(0, MAX_SHIFT):
+        c = CaesarCipher(args.string, CHARSET)
+        for i in range(0, len(CHARSET)):
             print(c.shift(i))
 
     if args.rot13 is True:
-        c = CaesarCipher(args.string)
+        c = CaesarCipher(args.string, CHARSET)
         print(c.shift(13))
     return 0
 
